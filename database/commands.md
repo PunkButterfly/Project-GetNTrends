@@ -28,7 +28,7 @@ GRANT SELECT ON *.* TO {role};
 Создать пользователя с ролью
 ```sql
 CREATE USER {login} IDENTIFIED WITH sha256_password BY '{password}';
-GRANT {role} TO {user};
+GRANT {role} TO {login};
 ```
 
 
