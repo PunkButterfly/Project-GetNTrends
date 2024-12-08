@@ -9,16 +9,13 @@ on:
       - main
   workflow_dispatch:
 env:
-  # project name / docker compose name
-  PROJECT_NAME: service-cicd
-
   # test ports
-  TEST_BACKEND_PORT: 8002
-  TEST_FRONTEND_PORT: 8001
+  TEST_BACKEND_PORT: 10002
+  TEST_FRONTEND_PORT: 10003
 
   # main ports
-  MAIN_BACKEND_PORT: 8006
-  MAIN_FRONTEND_PORT: 8005
+  MAIN_BACKEND_PORT: 10012
+  MAIN_FRONTEND_PORT: 10013
 
   BACKEND_PREIMAGE_PATH: preimages/backend
   FRONTEND_PREIMAGE_PATH: preimages/frontend
@@ -33,6 +30,10 @@ jobs:
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@master
+
+      - name: Set up Common env variables
+        run: echo "PROJECT_NAME=`echo ${{ github.event.repository.name }} | tr '[:upper:]' '[:lower:]'`" >> ${GITHUB_ENV}
+
       - name: Check backend requirements changes
         id: changed-backend-preimage
         uses: tj-actions/changed-files@v44
@@ -75,7 +76,10 @@ jobs:
     timeout-minutes: 30
     needs: BuildingPreimages
     steps:
-      - name: Setup Test Env Variables
+      - name: Set up Common env variables
+        run: echo "PROJECT_NAME=`echo ${{ github.event.repository.name }} | tr '[:upper:]' '[:lower:]'`" >> ${GITHUB_ENV}
+
+      - name: Set up Test env variables
         if: github.ref_name == 'test'
         run: |
           echo "
@@ -83,7 +87,7 @@ jobs:
           FRONTEND_PORT=${{ env.TEST_FRONTEND_PORT }}
           " >> $GITHUB_ENV
 
-      - name: Setup Main Env Variables
+      - name: Set up Main env variables
         if: github.ref_name == 'main'
         run: |
           echo "
